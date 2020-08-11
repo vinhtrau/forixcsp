@@ -9,9 +9,6 @@ namespace Forix\Csp\Controller\Adminhtml\Report;
 
 use Forix\Csp\Helper\ImportData;
 use Magento\Backend\App\Action;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\ResponseInterface;
-use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NotFoundException;
 use Psr\Log\LoggerInterface;
 
@@ -38,17 +35,20 @@ class ReportedList extends Action{
         try{
             $data = $this->helper->getReportedList();
             $list = [];
-            if(isset($data['frontend']) && count($data['frontend']))
-                $list = array_merge($list,$data['frontend']);
-            if(isset($data['admin']) && count($data['admin']))
-                $list = array_merge($list,$data['admin']);
-            $data = ['data' => $list];
+            if(isset($data['frontend']) && count($data['frontend'])){
+                $list = array_merge($list, $data['frontend']);
+            }
+            if(isset($data['admin']) && count($data['admin'])){
+                $list = array_merge($list, $data['admin']);
+            }
+            $data = ['data' => []];
+            foreach($list as $line){
+                $data['data'][] = str_replace(BP . "/var/", "", $line);
+            }
         }catch(NotFoundException $e){
-            $this->messageManager->addWarningMessage($e->getMessage());
-            $data = ['success' => 0, 'message' => $e->getMessage()];
+            $data = ['success' => 0, "no_file" => 1, 'message' => $e->getMessage()];
         }
         catch(\Exception $e){
-            $this->messageManager->addError("An error has been occurred");
             $this->logger->error($e->getMessage());
             $data = ['success' => 0, 'message' => 'An error has been occurred'];
         }

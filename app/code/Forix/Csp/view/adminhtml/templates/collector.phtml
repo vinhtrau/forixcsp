@@ -3,54 +3,108 @@
  * @var $this \Forix\Csp\Block\Adminhtml\Collector
  */
 ?>
-<?php if($list = $this->getReportedList()): ?>
-    <ul id="filelist"></ul>
-    <button id="save-report-data" type="button"
-            class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
-        Import Reported Data
-    </button>
-    <script type="text/javascript">
-        require(['jquery'], function ($) {
+<style>
+    #row_forix_csp_reported_list_list .label{display: none}
+    #row_forix_csp_reported_list_list td.value{padding: 0}
+    #filelist {
+        list-style: none;
+        max-width: 380px;
+    }
+    #filelist .file {
+        margin: 5px 0;
+        text-align: right;
+    }
+    #filelist .file .import_row {
+        margin-left: 10px;
+        font-size: 10px;
+        padding: 3px;
+    }
+</style>
+<?php
+$list = $this->getReportedList();
+?>
+<ul id="filelist"></ul>
+<button id="save-report-data" type="button"
+        <?php if(!count($list)): ?>disabled="true"<?php endif;?>
+        class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+    Import Reported Data
+</button>
+<button id="refresh-report-data" type="button"
+        class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+    Refresh List
+</button>
+<script type="text/javascript">
+    require(['jquery'], function ($) {
+        loadList();
+        var button = $('#save-report-data');
+        $('#save-report-data').click(function () {
+            button.attr("disabled");
+            $.ajax({
+                url: "<?= $this->getSubmitFormUrl()?>",
+                type: 'post',
+                data: {'form_key' : "<?= $this->getFormKey()?>"},
+                success: function (resp) {
+                    if(resp.message)
+                        alert(resp.message);
+                },
+                complete: function (resp){
+                    button.removeAttr("disabled");
+                    loadList();
+                }
+            });
+        });
+        $('#refresh-report-data').click(function(){
             loadList();
-            var button = $('#save-report-data');
-            $('#save-report-data').click(function () {
-                button.attr("disabled");
+        });
+
+        function applyEventImportRow(){
+            $('.import_row').unbind("click");
+            $('.import_row').click(function(e){
+                var button = e.currentTarget;
+                var url = "<?=$block->getSubmitFormUrl(); ?>";
+                button.disabled = true;
                 $.ajax({
-                    url: "<?= $this->getSubmitFormUrl()?>",
+                    url: url,
                     type: 'post',
-                    data: {'form_key' : "<?= $this->getFormKey()?>"},
-                    success: function (resp) {
-                        if(resp.message)
-                            alert(resp.message);
+                    data: {'row': $(button).attr('data-src')},
+                    success: function(resp){
+                        console.log(resp);
                     },
-                    complete: function (resp){
-                        button.removeAttr("disabled");
+                    complete: function(){
                         loadList();
                     }
                 });
             });
-            function loadList(){
-                var ul = $('#filelist');
-                ul.html('');
-                $.ajax({
-                    url: "<?= $this->getLoadListUrl()?>",
-                    type: "get",
-                    dataType: 'json',
-                    success: function(resp){
-                        console.log(resp);
-                        if (resp.data) {
-                            var list = resp.data;
-                            var html = '';
-                            for (var i = 0; i < list.length; i++) {
-                                html += "<li class='file'>" + list[i] + "</li>"
-                            }
-                            ul.append(html);
-                        }
-                    }
-                });
+        }
+        function generateHtml(data){
+            var html = '';
+            for (var i = 0; i < data.length; i++) {
+                html += "<li class='file'>" + data[i];
+                html += "<button type='button' class='import_row' data-src='"+data[i]+"'><span>Import this</span></button>";
+                html += "</li>";
             }
-        });
-    </script>
-<?php else: ?>
-    <p>No new reported data</p>
-<?php endif; ?>
+            return html;
+        }
+        function loadList() {
+            var ul = $('#filelist');
+            ul.html('');
+            $.ajax({
+                url: "<?= $this->getLoadListUrl()?>",
+                type: "get",
+                dataType: 'json',
+                success: function (resp) {
+                    if(resp.no_file != undefined && resp.no_file == 1){
+                        $('#save-report-data').attr('disabled', true);
+                    }
+                    else if (resp.data) {
+                        var html = generateHtml(resp.data);
+                        ul.append(html);
+                        applyEventImportRow();
+                        $('#save-report-data').attr('disabled', false);
+
+                    }
+                }
+            });
+        }
+    });
+</script>

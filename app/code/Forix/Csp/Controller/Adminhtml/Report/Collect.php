@@ -36,14 +36,20 @@ class Collect extends Action{
 
     public function execute(){
         try{
-            $this->helper->import();
+            if(!$this->_formKeyValidator->validate($this->getRequest())){
+                $data = ['success' => 0, 'message' => 'Invalid Form key'];
+                return $this->resultJsonFactory->setData($data);
+            }
+            $file = null;
+            if($this->getRequest()->getParam('row', false)){
+                $file[] = $this->getRequest()->getParam('row',null);
+            }
+            $this->helper->import($file);
             $data = ['success' => 1];
         }catch(NotFoundException $e){
-            $this->messageManager->addWarningMessage($e->getMessage());
-            $data = ['success' => 0, 'message' => $e->getMessage()];
+            $data = ['success' => 0, 'no_file' => 1, 'message' => $e->getMessage()];
         }
         catch(\Exception $e){
-            $this->messageManager->addError("An error has been occurred");
             $this->logger->error($e->getMessage());
             $data = ['success' => 0, 'message' => 'An error has been occurred'];
         }

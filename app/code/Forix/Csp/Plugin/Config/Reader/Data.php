@@ -73,8 +73,8 @@ class Data{
         /** @var \Magento\Framework\DB\Adapter\Pdo\Mysql $connection */
         $select = $this->connection->select();
         $select->from($this->connection->getTableName('forix_csp_collector'))
-               ->where("is_allowed", 1)
-               ->where('area', $area);
+               ->where("is_allowed = ?", 1)
+               ->where('area = ?', $area);
         $data = $this->connection->query($select)->fetchAll();
         if($data){
             $this->cache->save($this->serialize->serialize($data),$cacheId,["CONFIG"]);

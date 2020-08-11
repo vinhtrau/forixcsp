@@ -48,7 +48,16 @@ class ImportData extends AbstractHelper{
         return $this->scopeConfig->getValue('forix_csp/general/enabled');
     }
 
-    public function getReportedList(){
+    public function getReportedList($rows = null){
+        if($rows){
+            $list = [];
+            foreach($rows as $file){
+                $_files = explode('/',$file);
+                $type = $_files[1];
+                $list[$type][] = BP . "/var/" .$file;
+            }
+            return $list;
+        }
         $listFe    = glob($this->_baseDir . "/frontend/csp_*.csv");
         $listAdmin = glob($this->_baseDir . "/admin/csp_*.csv");
         $list      = [
@@ -61,12 +70,12 @@ class ImportData extends AbstractHelper{
 
         return $list;
     }
-    public function import(){
+    public function import($rows = null){
         if(!$this->isEnabled()){
             throw new \Exception("Module is disabled");
         }
 
-        $list = $this->getReportedList();
+        $list = $this->getReportedList($rows);
         $cspExists = $this->getCspReported();
         $connection = $this->getConnection();
         $col = [
@@ -110,7 +119,7 @@ class ImportData extends AbstractHelper{
                         }
                     }
                 }
-                if($success)
+//                if($success)
                     unlink($file);
             }
         }
