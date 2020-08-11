@@ -1,0 +1,56 @@
+<?php
+/**
+ * @var $this \Forix\Csp\Block\Adminhtml\Collector
+ */
+?>
+<?php if($list = $this->getReportedList()): ?>
+    <ul id="filelist"></ul>
+    <button id="save-report-data" type="button"
+            class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+        Import Reported Data
+    </button>
+    <script type="text/javascript">
+        require(['jquery'], function ($) {
+            loadList();
+            var button = $('#save-report-data');
+            $('#save-report-data').click(function () {
+                button.attr("disabled");
+                $.ajax({
+                    url: "<?= $this->getSubmitFormUrl()?>",
+                    type: 'post',
+                    data: {'form_key' : "<?= $this->getFormKey()?>"},
+                    success: function (resp) {
+                        if(resp.message)
+                            alert(resp.message);
+                    },
+                    complete: function (resp){
+                        button.removeAttr("disabled");
+                        loadList();
+                    }
+                });
+            });
+            function loadList(){
+                var ul = $('#filelist');
+                ul.html('');
+                $.ajax({
+                    url: "<?= $this->getLoadListUrl()?>",
+                    type: "get",
+                    dataType: 'json',
+                    success: function(resp){
+                        console.log(resp);
+                        if (resp.data) {
+                            var list = resp.data;
+                            var html = '';
+                            for (var i = 0; i < list.length; i++) {
+                                html += "<li class='file'>" + list[i] + "</li>"
+                            }
+                            ul.append(html);
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+<?php else: ?>
+    <p>No new reported data</p>
+<?php endif; ?>
