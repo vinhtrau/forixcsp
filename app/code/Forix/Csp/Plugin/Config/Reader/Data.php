@@ -48,10 +48,11 @@ class Data{
      */
     public function afterGet($subject, $config){
         if($data = $this->_loadCsp()){
+
             foreach($data as $cspAllow){
                 $type = $cspAllow['directive'];
                 $host = $cspAllow['host'];
-                if(!isset($config[$type]) || !in_array($host, $config[$type]['hosts'])){
+                if(!isset($config[$type]) || !isset($config[$type]['hosts']) || !in_array($host, $config[$type]['hosts'])){
                     $config[$type]['hosts'][] = $host;
                 }
                 if(!isset($config[$type]['hashes'])){
