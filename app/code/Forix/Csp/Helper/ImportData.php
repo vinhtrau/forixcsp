@@ -109,9 +109,6 @@ class ImportData extends AbstractHelper{
                                 "message" => $e->getMessage()
                             ];
                             $this->_logger->error(print_r($dataError,1));
-                            if(class_exists("ForixDebug")){
-                                \ForixDebug::log($dataError, 'csp_import.log');
-                            }
                             /* Move error file to folder */
 //                            $fileArr = pathinfo($file);
 //                            $newFile = $this->_errorDir . "/" . $area . "_" . $fileArr['basename'];

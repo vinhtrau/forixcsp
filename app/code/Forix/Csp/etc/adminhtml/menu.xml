@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Forix_Csp::reports" title="Forix Csp Reports" module="Forix_Csp" sortOrder="51"
+             parent="Magento_Reports::report"
+             resource="Forix_Csp::all"/>
+        <add id="Forix_Csp::report_list" title="Manage Report Rules" module="Forix_Csp" sortOrder="10"
+             action="cspreport/report" resource="Forix_Csp::report_list"
+             parent="Forix_Csp::reports"/>
+<!--        <add id="Forix_Csp::csp_configuration" title="Configuration" module="Forix_Csp"-->
+<!--             sortOrder="99" parent="Forix_Csp::all"-->
+<!--             action="adminhtml/system_config/edit/section/helloworld"-->
+<!--             resource="Forix_Csp::csp_configuration"/>-->
+    </menu>
+</config>

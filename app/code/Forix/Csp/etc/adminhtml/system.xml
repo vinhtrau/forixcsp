@@ -19,17 +19,22 @@
                 <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Enable Report</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Use Report-Only mode</comment>
+                </field>
+                <field id="apply_rules" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Apply Rules</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="report_uri" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Report URI</label>
-                    <comment>Default: CatchCsp.php</comment>
+                    <comment>Default: /cspreport/index/report</comment>
                     <depends>
                         <field id="enabled">1</field>
                     </depends>
                 </field>
                 <field id="report_uri_admin" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Report URI for Admin</label>
-                    <comment>Default: BeCatchCsp.php</comment>
+                    <comment>Default: /cspreport/index/reportz</comment>
                     <depends>
                         <field id="enabled">1</field>
                     </depends>

@@ -13,7 +13,6 @@ use Magento\Framework\Serialize\Serializer\Serialize;
 
 class Data{
 
-    CONST ROOT_SCRIPT = 'CatchCsp.php';
     /**
      * @var \Magento\Framework\Config\CacheInterface
      */
@@ -24,6 +23,7 @@ class Data{
      * @var $serialize Serialize
      */
     protected $serialize;
+    protected $configHelper;
     /**
      * @var $connection ResourceConnection
      */
@@ -33,12 +33,14 @@ class Data{
         \Magento\Framework\Config\CacheInterface $cache,
         ResourceConnection $resource_connection,
         State $state,
-        Serialize $serialize
+        Serialize $serialize,
+        \Forix\Csp\Helper\Config $configHelper
     ){
-        $this->cache      = $cache;
-        $this->state      = $state;
-        $this->serialize  = $serialize;
-        $this->connection = $resource_connection->getConnection('default');
+        $this->cache        = $cache;
+        $this->state        = $state;
+        $this->serialize    = $serialize;
+        $this->configHelper = $configHelper;
+        $this->connection   = $resource_connection->getConnection('default');
     }
 
 
@@ -47,16 +49,23 @@ class Data{
      * @param $config
      */
     public function afterGet($subject, $config){
+        if(!$this->configHelper->isEnableRule()){
+            \ForixDebug::log(__METHOD__ . " : " . __LINE__,'info.log');
+            return $config;
+        }
         if($data = $this->_loadCsp()){
-
-            foreach($data as $cspAllow){
-                $type = $cspAllow['directive'];
-                $host = $cspAllow['host'];
-                if(!isset($config[$type]) || !isset($config[$type]['hosts']) || !in_array($host, $config[$type]['hosts'])){
-                    $config[$type]['hosts'][] = $host;
+            foreach($data as $directive => $hosts){
+                $hostArr = array_unique(explode(",",$hosts));
+                if(!isset($config[$directive])){
+                    $config[$directive]['hosts'] = $hostArr;
+                }else{
+                    if(isset($config[$directive]['hosts'])){
+                        $host = array_unique(array_merge($hostArr, $config[$directive]['hosts']));
+                        $config[$directive]['hosts'] = $host;
+                    }
                 }
-                if(!isset($config[$type]['hashes'])){
-                    $config[$type]['hashes'] = [];
+                if(!isset($config[$directive]['hashes'])){
+                    $config[$directive]['hashes'] = [];
                 }
             }
         }
@@ -65,20 +74,27 @@ class Data{
 
     protected function _loadCsp(){
         $areaCode = $this->state->getAreaCode();
-        $area = $areaCode == "adminhtml" ? 'admin': $areaCode;
-        $cacheId = "forix_csp_collector_".$area;
-        if($data = $this->cache->load($cacheId)){
+        $area     = $areaCode == "adminhtml" ? 'admin' : $areaCode;
+        $cacheId  = "forix_csp_collector_" . $area;
+        /*if($data = $this->cache->load($cacheId)){
             return $this->serialize->unserialize($data);
-        }
-        /** fetch from database */
+        }*/
+        /** Fetch from database */
+        $query = "SET SESSION group_concat_max_len = 100000;";
+        $this->connection->query($query);
         /** @var \Magento\Framework\DB\Adapter\Pdo\Mysql $connection */
         $select = $this->connection->select();
-        $select->from($this->connection->getTableName('forix_csp_collector'))
+        $table = $this->connection->getTableName('forix_csp_collector');
+        $select->from(["csp" => $table])
+               ->reset('columns')
+               ->where("area = ?", $area)
                ->where("is_allowed = ?", 1)
-               ->where('area = ?', $area);
-        $data = $this->connection->query($select)->fetchAll();
+               ->group("directive")
+               ->columns(new \Zend_Db_Expr("csp.directive, GROUP_CONCAT(csp.host) as hosts"))
+        ;
+        $data = $this->connection->query($select)->fetchAll(\PDO::FETCH_KEY_PAIR);
         if($data){
-            $this->cache->save($this->serialize->serialize($data),$cacheId,["CONFIG"]);
+            $this->cache->save($this->serialize->serialize($data), $cacheId, ["CONFIG"]);
         }
         return $data;
     }
