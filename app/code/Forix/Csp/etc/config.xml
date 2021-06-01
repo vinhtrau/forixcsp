@@ -11,9 +11,10 @@
     <default>
         <forix_csp>
             <general>
-                <enabled>0</enabled>
-                <report_uri>/CatchCsp.php</report_uri>
-                <report_uri_admin>/BeCatchCsp.php</report_uri_admin>
+                <enabled>1</enabled>
+                <apply_rules>0</apply_rules>
+                <report_uri>/cspreport/index/report</report_uri>
+                <report_uri_admin>/cspreport/index/report</report_uri_admin>
             </general>
         </forix_csp>
     </default>

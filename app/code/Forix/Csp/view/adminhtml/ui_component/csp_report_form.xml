@@ -119,5 +119,28 @@
                 </select>
             </formElements>
         </field>
+        <field name="area" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">report</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="no-marginal-whitespace" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Area</label>
+                <dataScope>area</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Forix\Csp\Model\Source\Area"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
     </fieldset>
 </form>

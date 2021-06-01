@@ -114,7 +114,6 @@
                     <editorType>text</editorType>
                 </editor>
                 <label translate="true">Host</label>
-                <sorting>asc</sorting>
             </settings>
         </column>
         <column name="directive">
@@ -126,7 +125,17 @@
                 <dataType>select</dataType>
                 <options class="Forix\Csp\Model\Source\Policies"/>
                 <label translate="true">Directive</label>
-                <sorting>asc</sorting>
+            </settings>
+        </column>
+        <column name="area">
+            <settings>
+                <filter>select</filter>
+                <editor>
+                    <editorType>select</editorType>
+                </editor>
+                <dataType>select</dataType>
+                <options class="Forix\Csp\Model\Source\Area"/>
+                <label translate="true">Area</label>
             </settings>
         </column>
         <column name="is_allowed" component="Magento_Ui/js/grid/columns/select" >

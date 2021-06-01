@@ -42,9 +42,9 @@ class Report extends Action implements \Magento\Framework\App\CsrfAwareActionInt
             $jsonData      = json_decode($jsonData, true);
             $cspReportData = $jsonData['csp-report'];
             $blockUrl = parse_url($cspReportData['blocked-uri']);
-            if($cspReportData['blocked-uri'] == "data"){
-                $host = "data:";
-            } else{
+            if(!in_array($blockUrl['scheme'], ['https','http'])){
+                $host = $blockUrl['scheme'].":";
+            }else{
                 $host = $blockUrl['host'];
             }
             if(empty($host)){

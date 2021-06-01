@@ -32,4 +32,29 @@ class Config extends AbstractHelper{
     public function getAdminReportUri(){
         return $this->scopeConfig->getValue('forix_csp/general/report_uri_admin');
     }
+
+    /**
+     * @param array $data Array data contain hosts URL
+     */
+    public function mergeHost(array $data){
+        $w = [];
+        foreach($data as $host){
+            if(strpos($host, "*") !== false || strpos($host, ".") === false){
+                $w[$host]["csp_url"] = $host;
+                continue;
+            }
+            $_host             = explode(".", $host);
+            $l                 = count($_host);
+            $key               = $_host[$l-2] . "_" . $_host[$l-1];
+            $w[$key]['host'][] = $host;
+            if(count($w[$key]['host']) > 1){
+                $useUrl             = "*." . $_host[$l-2] . "." . $_host[$l-1];
+                $w[$key]["csp_url"] = $useUrl;
+            } else{
+                $w[$key]["csp_url"] = $host;
+            }
+        }
+        $cspUrl = array_unique(array_column($w,'csp_url'));
+        return $cspUrl;
+    }
 }

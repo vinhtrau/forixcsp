@@ -17,7 +17,6 @@ class Policies implements OptionSourceInterface{
         foreach($policies as $policy){
             $options[] = ['label' => $policy, 'value' => $policy];
         }
-        \ForixDebug::log($options,'info.log');
         return $options;
     }
 }

@@ -29,7 +29,7 @@ class MassApprove extends \Magento\Backend\App\Action{
             try{
                 $count = empty($ids) ? 'all':count($ids);
                 $this->resourceModel->massStatus($ids,1);
-                $this->messageManager->addSuccessMessage(__('Pended %1 items', $count));
+                $this->messageManager->addSuccessMessage(__('Approved %1 items', $count));
             }catch(\Exception $e){
                 $this->messageManager->addErrorMessage($e->getMessage());
             }

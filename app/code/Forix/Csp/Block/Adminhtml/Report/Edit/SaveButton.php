@@ -27,7 +27,7 @@ class SaveButton extends GenericButton implements ButtonProviderInterface{
                                 'params'     => [
                                     true,
                                     [
-                                        'back' => 'continue'
+                                        'back' => 'close'
                                     ]
                                 ]
                             ]
@@ -65,8 +65,8 @@ class SaveButton extends GenericButton implements ButtonProviderInterface{
                 ]
             ],
             [
-                'id_hard' => 'save_and_close',
-                'label' => __('Save & Close'),
+                'id_hard' => 'save_and_continue',
+                'label' => __('Save & Continue'),
                 'data_attribute' => [
                     'mage-init' => [
                         'buttonAdapter' => [
@@ -77,7 +77,7 @@ class SaveButton extends GenericButton implements ButtonProviderInterface{
                                     'params' => [
                                         true,
                                         [
-                                            'back' => 'close'
+                                            'back' => 'continue'
                                         ]
                                     ]
                                 ]
